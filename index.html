@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專業麻將結算器</title>
+    <style>
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 10px; background-color: #f0f2f0; color: #333; }
+        .container { max-width: 550px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: auto; padding-bottom: 120px; }
+        h2 { color: #1b5e20; text-align: center; margin-bottom: 15px; border-bottom: 3px solid #1b5e20; padding-bottom: 8px; }
+        .section { margin-bottom: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 10px; background: #fff; }
+        .section-title { font-weight: bold; margin-bottom: 10px; color: #2e7d32; display: flex; align-items: center; border-left: 4px solid #2e7d32; padding-left: 8px; font-size: 1.1em; }
+        
+        .flex-row { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+        .wind-box { flex: 1; min-width: 60px; text-align: center; padding: 8px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; font-size: 0.9em; }
+        .wind-box input { display: none; }
+        .wind-box:has(input:checked) { background: #2e7d32; border-color: #1b5e20; font-weight: bold; color: white; }
+
+        .flower-group-title { font-size: 0.85em; color: #666; margin: 8px 0 4px 2px; font-weight: bold; }
+        .flower-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+        .flower-btn { text-align: center; padding: 10px 2px; border: 1px solid #f0e68c; border-radius: 8px; background: #fffde7; cursor: pointer; font-size: 0.85em; transition: 0.2s; }
+        .flower-btn input { display: none; }
+        .flower-btn:has(input:checked) { background: #fbc02d; border-color: #f57f17; font-weight: bold; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+
+        .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .rule-item { display: flex; align-items: center; font-size: 0.95em; padding: 6px; cursor: pointer; border-radius: 4px; }
+        .rule-item input { width: 16px; height: 16px; margin-right: 8px; }
+
+        /* 指定色碼按鈕樣式 */
+        .reset-btn { width: 100%; background-color: #D28EFF; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 4px 0 #9e64bd; }
+        .reset-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #9e64bd; }
+
+        .result-box { background: #1b5e20; color: white; padding: 15px; border-radius: 15px; text-align: center; position: fixed; bottom: 10px; width: calc(100% - 50px); max-width: 500px; left: 50%; transform: translateX(-50%); box-shadow: 0 -5px 15px rgba(0,0,0,0.2); }
+        #total-cash { font-size: 2.2em; color: #ffeb3b; font-weight: bold; }
+        .detail-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin: 2px; }
+        .highlight-wind { color: #d32f2f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>專業麻將結算器</h2>
+
+    <div class="section" style="background-color: #fff3e0;">
+        <span class="section-title" style="color:#e65100;">基本設定</span>
+        <label><input type="checkbox" id="is-banker"> 我是莊家</label>
+        <select id="banker-streak" style="margin-left:10px;">
+            <option value="0">不連 (拉0)</option>
+            <option value="1">連1拉1 (3台)</option>
+            <option value="2">連2拉2 (5台)</option>
+            <option value="3">連3拉3 (7台)</option>
+            <option value="4">連4拉4 (9台)</option>
+        </select>
+        <div style="margin-top:10px;">
+            底：<input type="number" id="base-money" value="50" style="width:50px;"> 
+            台：<input type="number" id="point-money" value="20" style="width:50px;">
+        </div>
+    </div>
+
+    <div class="section">
+        <span class="section-title">場風/座位</span>
+        <div class="flex-row">
+            <label class="wind-box"><input type="radio" name="round-wind" value="東" checked> 東風圈</label>
+            <label class="wind-box"><input type="radio" name="round-wind" value="南"> 南風圈</label>
+            <label class="wind-box"><input type="radio" name="round-wind" value="西"> 西風圈</label>
+            <label class="wind-box"><input type="radio" name="round-wind" value="北"> 北風圈</label>
+        </div>
+        <div class="flex-row" style="margin-top:8px;">
+            <label class="wind-box"><input type="radio" name="my-wind" value="東" checked data-num="1"> 東家</label>
+            <label class="wind-box"><input type="radio" name="my-wind" value="南" data-num="2"> 南家</label>
+            <label class="wind-box"><input type="radio" name="my-wind" value="西" data-num="3"> 西家</label>
+            <label class="wind-box"><input type="radio" name="my-wind" value="北" data-num="4"> 北家</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <span class="section-title">持有花牌 (自動判定對花)</span>
+        <div class="flower-group-title">四季</div>
+        <div class="flower-grid">
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="1"> 春</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="2"> 夏</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="3"> 秋</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="4"> 冬</label>
+        </div>
+        <div class="flower-group-title">四君子</div>
+        <div class="flower-grid">
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="1"> 梅</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="2"> 蘭</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="3"> 竹</label>
+            <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="4"> 菊</label>
+        </div>
+    </div>
+
+    <div class="section">
+        <span class="section-title">常見牌型</span>
+        <div class="rule-grid">
+            <label class="rule-item"><input type="checkbox" id="check-round-wind"> 碰場風牌 (<span id="txt-round-wind">東</span>)</label>
+            <label class="rule-item"><input type="checkbox" id="check-my-wind"> 碰座位風 (<span id="txt-my-wind">東</span>)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 門清 (1台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 自摸 (1台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="2"> 平胡 (2台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="4"> 碰碰胡 (4台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="4"> 湊一色 (4台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 三暗刻 (1台)</label>
+        </div>
+    </div>
+
+    <div class="section" style="background-color: #fdf2f2;">
+        <span class="section-title" style="color:#b71c1c;">罕見/大牌牌型</span>
+        <div class="rule-grid">
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 大三元 (8台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 大四喜 (16台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 清一色 (8台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 字一色 (16台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 八仙過海 (16台)</label>
+            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 七搶一 (8台)</label>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetForm()">一鍵清空</button>
+
+    <div class="result-box">
+        <div>總台數：<span id="total-points">0</span> 台</div>
+        <div id="total-cash">0 元</div>
+        <div id="detail-log"></div>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        let points = 0;
+        let logs = [];
+
+        const roundWindVal = document.querySelector('input[name="round-wind"]:checked').value;
+        const myWindBtn = document.querySelector('input[name="my-wind"]:checked');
+        const myWindVal = myWindBtn.value;
+        const myWindNum = myWindBtn.getAttribute('data-num');
+
+        document.getElementById('txt-round-wind').textContent = roundWindVal;
+        document.getElementById('txt-my-wind').textContent = myWindVal;
+
+        if (document.getElementById('is-banker').checked) {
+            points += 1; logs.push("莊家:1台");
+        }
+        let streak = parseInt(document.getElementById('banker-streak').value);
+        if (streak > 0) {
+            points += (streak * 2); logs.push(`連${streak}拉${streak}: ${streak*2}台`);
+        }
+
+        let flowerCount = 0;
+        let matchCount = 0;
+        document.querySelectorAll('.flower-checkbox').forEach(cb => {
+            if (cb.checked) {
+                flowerCount++;
+                if (cb.getAttribute('data-num') === myWindNum) matchCount++;
+            }
+        });
+        if (flowerCount > 0) { points += flowerCount; logs.push(`花牌:${flowerCount}台`); }
+        if (matchCount > 0) { points += matchCount; logs.push(`對花:+${matchCount}台`); }
+
+        if (document.getElementById('check-round-wind').checked) {
+            points += 1; logs.push(`場風${roundWindVal}:1台`);
+        }
+        if (document.getElementById('check-my-wind').checked) {
+            points += 1; logs.push(`座位風${myWindVal}:1台`);
+        }
+
+        document.querySelectorAll('.point-checkbox').forEach(item => {
+            if (item.checked) {
+                let p = parseInt(item.getAttribute('data-points'));
+                let name = item.parentElement.textContent.trim().split(' ')[0];
+                points += p;
+                logs.push(`${name}:${p}台`);
+            }
+        });
+
+        const base = parseInt(document.getElementById('base-money').value) || 0;
+        const perPoint = parseInt(document.getElementById('point-money').value) || 0;
+        const cash = points > 0 ? base + (points * perPoint) : 0;
+
+        document.getElementById('total-points').textContent = points;
+        document.getElementById('total-cash').textContent = cash + " 元";
+        document.getElementById('detail-log').innerHTML = logs.map(l => `<span class="detail-tag">${l}</span>`).join('');
+    }
+
+    function resetForm() {
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+        document.getElementById('banker-streak').value = "0";
+        calculate();
+    }
+
+    document.addEventListener('change', calculate);
+    document.addEventListener('input', calculate);
+    calculate();
+</script>
+
+</body>
+</html>下午 03:14 2025/12/30
