@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🀄專業麻將結算器</title>
+    <title>專業麻將結算器</title>
     <style>
         body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; padding: 10px; background-color: #f0f2f0; color: #333; }
         .container { max-width: 550px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin: auto; padding-bottom: 120px; }
@@ -18,32 +18,32 @@
 
         .flower-group-title { font-size: 0.85em; color: #666; margin: 8px 0 4px 2px; font-weight: bold; }
         .flower-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-        .flower-btn { text-align: center; padding: 10px 2px; border: 1px solid #f0e68c; border-radius: 8px; background: #fffde7; cursor: pointer; font-size: 0.85em; transition: 0.2s; }
+        .flower-btn { text-align: center; padding: 10px 2px; border: 1px solid #f0e68c; border-radius: 8px; background: #fffde7; cursor: pointer; font-size: 0.85em; }
         .flower-btn input { display: none; }
-        .flower-btn:has(input:checked) { background: #fbc02d; border-color: #f57f17; font-weight: bold; box-shadow: inset 0 0 5px rgba(0,0,0,0.2); }
+        .flower-btn:has(input:checked) { background: #fbc02d; border-color: #f57f17; font-weight: bold; }
 
         .rule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .rule-item { display: flex; align-items: center; font-size: 0.95em; padding: 6px; cursor: pointer; border-radius: 4px; }
-        .rule-item input { width: 16px; height: 16px; margin-right: 8px; }
+        .rule-item { display: flex; align-items: center; font-size: 0.95em; padding: 6px; cursor: pointer; position: relative; }
+        .rule-item input { width: 18px; height: 18px; margin-right: 8px; }
 
-        /* 指定色碼按鈕樣式 */
-        .reset-btn { width: 100%; background-color: #00AAAA; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; margin-bottom: 10px; box-shadow: 0 4px 0 #9e64bd; }
+        .info-icon { display: inline-flex; width: 16px; height: 16px; line-height: 16px; justify-content: center; align-items: center; border-radius: 50%; background: #e0e0e0; color: #666; font-size: 11px; margin-left: 4px; cursor: help; font-style: normal; }
+
+        .reset-btn { width: 100%; background-color: #D28EFF; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #9e64bd; }
         .reset-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #9e64bd; }
 
         .result-box { background: #1b5e20; color: white; padding: 15px; border-radius: 15px; text-align: center; position: fixed; bottom: 10px; width: calc(100% - 50px); max-width: 500px; left: 50%; transform: translateX(-50%); box-shadow: 0 -5px 15px rgba(0,0,0,0.2); }
         #total-cash { font-size: 2.2em; color: #ffeb3b; font-weight: bold; }
         .detail-tag { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.8em; margin: 2px; }
-        .highlight-wind { color: #d32f2f; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🀄專業麻將結算器</h2>
+    <h2>專業麻將結算器</h2>
 
     <div class="section" style="background-color: #fff3e0;">
         <span class="section-title" style="color:#e65100;">基本設定</span>
-        <label><input type="checkbox" id="is-banker"> ⭐我是莊家</label>
+        <label><input type="checkbox" id="is-banker"> 我是莊家</label>
         <select id="banker-streak" style="margin-left:10px;">
             <option value="0">不連 (拉0)</option>
             <option value="1">連1拉1 (3台)</option>
@@ -74,7 +74,7 @@
     </div>
 
     <div class="section">
-        <span class="section-title">持有花牌 (自動判定對花)</span>
+        <span class="section-title">持有花牌</span>
         <div class="flower-group-title">四季</div>
         <div class="flower-grid">
             <label class="flower-btn"><input type="checkbox" class="flower-checkbox" data-num="1"> 春</label>
@@ -92,28 +92,70 @@
     </div>
 
     <div class="section">
-        <span class="section-title">常見牌型</span>
+        <span class="section-title">⭐ 常見牌型</span>
         <div class="rule-grid">
-            <label class="rule-item"><input type="checkbox" id="check-round-wind"> 碰場風牌 (<span id="txt-round-wind">東</span>)</label>
-            <label class="rule-item"><input type="checkbox" id="check-my-wind"> 碰座位風 (<span id="txt-my-wind">東</span>)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 門清 (1台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 自摸 (1台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="2"> 平胡 (2台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="4"> 碰碰胡 (4台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="4"> 湊一色 (4台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="1"> 三暗刻 (1台)</label>
+            <label class="rule-item">
+                <input type="checkbox" id="check-round-wind"> 碰場風牌
+                <span class="info-icon" onclick="showInfo('場風牌','與目前場風相同的刻子(如東風圈碰東風)。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" id="check-my-wind"> 碰座位風
+                <span class="info-icon" onclick="showInfo('座位風','與自己方位相同的刻子(如坐南家碰南風)。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="1"> 門清 (1台)
+                <span class="info-icon" onclick="showInfo('門清','沒有吃、碰、明槓，全部牌由自己摸入。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="1"> 自摸 (1台)
+                <span class="info-icon" onclick="showInfo('自摸','最後一張胡牌是由自己摸入，非他人放槍。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="2"> 平胡 (2台)
+                <span class="info-icon" onclick="showInfo('平胡','全順子、無刻、無花、非自摸、聽兩頭、無字。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="4"> 碰碰胡 (4台)
+                <span class="info-icon" onclick="showInfo('碰碰胡','全部由刻子(碰或暗刻)與一對將組成。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="4"> 湊一色 (4台)
+                <span class="info-icon" onclick="showInfo('湊一色','單一花色(萬筒條)加上字牌組成。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="1"> 三暗刻 (1台)
+                <span class="info-icon" onclick="showInfo('三暗刻','手內有三組自己摸到的刻子(非碰牌)。')">i</span>
+            </label>
         </div>
     </div>
 
     <div class="section" style="background-color: #fdf2f2;">
-        <span class="section-title" style="color:#b71c1c;">罕見/大牌牌型</span>
+        <span class="section-title" style="color:#b71c1c;">🏆 罕見/大牌牌型</span>
         <div class="rule-grid">
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 大三元 (8台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 大四喜 (16台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 清一色 (8台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 字一色 (16台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="16"> 八仙過海 (16台)</label>
-            <label class="rule-item"><input type="checkbox" class="point-checkbox" data-points="8"> 七搶一 (8台)</label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="8"> 大三元 (8台)
+                <span class="info-icon" onclick="showInfo('大三元','集齊中、發、白三組刻子。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="16"> 大四喜 (16台)
+                <span class="info-icon" onclick="showInfo('大四喜','集齊東、南、西、北四組刻子。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="8"> 清一色 (8台)
+                <span class="info-icon" onclick="showInfo('清一色','全副牌均由同一種花色組成(萬筒條)。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="16"> 字一色 (16台)
+                <span class="info-icon" onclick="showInfo('字一色','全副牌均由字牌組成。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="16"> 八仙過海 (16台)
+                <span class="info-icon" onclick="showInfo('八仙過海','拿齊全部八張花牌。')">i</span>
+            </label>
+            <label class="rule-item">
+                <input type="checkbox" class="point-checkbox" data-points="8"> 七搶一 (8台)
+                <span class="info-icon" onclick="showInfo('七搶一','持七張花牌時，摸到第八張由他人持有。')">i</span>
+            </label>
         </div>
     </div>
 
@@ -127,6 +169,10 @@
 </div>
 
 <script>
+    function showInfo(title, text) {
+        alert(title + "\n\n" + text);
+    }
+
     function calculate() {
         let points = 0;
         let logs = [];
@@ -168,9 +214,9 @@
         document.querySelectorAll('.point-checkbox').forEach(item => {
             if (item.checked) {
                 let p = parseInt(item.getAttribute('data-points'));
-                let name = item.parentElement.textContent.trim().split(' ')[0];
+                let label = item.parentElement.textContent.trim().split(' ')[0];
                 points += p;
-                logs.push(`${name}:${p}台`);
+                logs.push(`${label}:${p}台`);
             }
         });
 
@@ -184,9 +230,7 @@
     }
 
     function resetForm() {
-        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-            cb.checked = false;
-        });
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         document.getElementById('banker-streak').value = "0";
         calculate();
     }
@@ -196,7 +240,8 @@
     calculate();
 </script>
 
+<span id="txt-round-wind" style="display:none"></span>
+<span id="txt-my-wind" style="display:none"></span>
+
 </body>
-
-</html>下午 03:14 2025/12/30
-
+</html>
